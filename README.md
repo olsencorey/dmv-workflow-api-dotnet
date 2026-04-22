@@ -235,11 +235,65 @@ cd src/DmvWorkflow.Api
 dotnet run
 ```
 
-Then open Swagger in the browser at:
+## Testing in Swagger
+
+After running the API locally, open Swagger in your browser at:
 
 ```text
 https://localhost:xxxx/swagger
 ```
+
+Use the endpoints in this order to test the full renewal workflow:
+
+### 1. Start session
+Use `POST /api/renewals/sessions`
+
+```json
+{
+  "channel": "Kiosk",
+  "kioskId": "AZ-PHX-001"
+}
+```
+
+Copy the returned `sessionId`.
+
+### 2. Look up vehicle
+Use `POST /api/renewals/sessions/{sessionId}/lookup`
+
+```json
+{
+  "noticeNumber": "RN-2026-0001"
+}
+```
+
+### 3. Create quote
+Use `POST /api/renewals/sessions/{sessionId}/quote`
+
+```json
+{
+  "months": 12,
+  "deliveryMethod": "PrintAtKiosk"
+}
+```
+
+### 4. Submit payment
+Use `POST /api/renewals/sessions/{sessionId}/payment`
+
+```json
+{
+  "paymentMethod": "Card",
+  "amount": 118.5,
+  "last4": "4242"
+}
+```
+
+### 5. Finalize renewal
+Use `POST /api/renewals/sessions/{sessionId}/finalize`
+
+Copy the returned `receiptNumber`.
+
+### 6. Retrieve receipt
+Use `GET /api/renewals/receipts/{receiptNumber}`
 
 ## Current design decisions
 
